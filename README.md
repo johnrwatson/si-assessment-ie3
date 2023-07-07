@@ -2,25 +2,28 @@
 
 ## Overview
 
- This test aims to build, validate, containerize, and deploy a backend and frontend service to a cloud platform. 
+ This test aims to build, validate, containerize, and deploy a backend and frontend service to a cloud platform.
 
 ## Approach
 
-I have broken the approach into three sections: Development Flow, Continuous Integration and then finally Continuous Delivery. 
+I have broken the approach into three sections: Development Flow, Continuous Integration and then finally Continuous Delivery.
 
 Hopefully this makes it easier to follow the path I have taken. I have also outlined the reasoning behind each of the bullets in the below list, along with the PR(s) that added that functionality if that helps.
 
 ## Path Checklist
 
 1. Development Flow: Branch protection, code integrity, and establish development flow:
-   - [ ] Add to README.md with details of the task
-   - [ ] Setup branch restrictions/push policies
-   - [ ] Setup precommit
+   - [X] Add to README.md with details of the task
+         - https://github.com/johnrwatson/si-assessment-ie3/pull/1
+   - [X] Setup branch restrictions/push policies
+         - in repository configuration
+   - [X] Setup precommit
+         - https://github.com/johnrwatson/si-assessment-ie3/pull/2
    - [ ] Setup semantic release
 
 2. CI (Continuous Integration): Build, Test, and Release flow:
    - [ ] Build + Containerize the applications, with local deployment validation
-   - [ ] Initiate tests in CI 
+   - [ ] Initiate tests in CI
      - [ ] Lint
      - [ ] Unit Test
      - [ ] Security Scan
@@ -36,4 +39,3 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
 ## Considerations
 
 TODO: List considerations for users of the repository.
-

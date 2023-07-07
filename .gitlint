@@ -1,0 +1,13 @@
+[general]
+contrib=contrib-title-conventional-commits
+extra-path=.gitlint-custom/gitlint-custom-defined-rules.py
+
+# Ignore certain rules (comma-separated list), you can reference them by
+# their id or by their full name
+ignore=body-is-missing,T3,B1,T1
+
+# Ignore any data send to gitlint via stdin
+ignore-stdin=true
+
+[contrib-title-conventional-commits]
+types = breaking,chore,docs,feat,fix,hotfix,minor,patch,perf,style,test
