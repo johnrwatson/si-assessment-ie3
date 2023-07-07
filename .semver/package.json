@@ -1,0 +1,17 @@
+{
+    "name": "si-assessment-ie3",
+    "version": "ARTIFACT_VERSION",
+    "description": "SI Assessment for Infrastructure Engineer iii",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/johnrwatson/si-assessment-ie3"
+    },
+    "readme": "README.md",
+    "license": "Apache License 2.0",
+    "private": true,
+    "devDependencies": {
+      "@semantic-release/git": "^10.0.0",
+      "semantic-release": "^21.0.0"
+    },
+    "main": ".releaserc.json"
+  }
