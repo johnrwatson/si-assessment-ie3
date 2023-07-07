@@ -16,10 +16,16 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
    - [X] Add to README.md with details of the task
          - https://github.com/johnrwatson/si-assessment-ie3/pull/1
    - [X] Setup branch restrictions/push policies
+         - Protecting release branches is critical to making sure you have some basic protection measures over the mainline. What would happen is someone accidentally force rebased over all the commits in main? This stops that happening and lots of other accidental or intentional behaviour. (NB: without Github enterprise the rules are there but they are not enforced.)
          - in repository configuration
    - [X] Setup precommit
+         - Precommit allows an organisation or project to assert specific standards on commit types and usually some basic rules like whitespace management. It can be a little annoying if implemented poorly, so I usually find it best to keep it simple with as few external dependencies as possible
          - https://github.com/johnrwatson/si-assessment-ie3/pull/2
-   - [ ] Setup semantic release
+   - [X] Setup semantic release
+         - Semantic Release builds on the rules from the precommit hook and asserts that the expected release happens. In this github workflow it runs on all commits. On main it will execute the actual release of the tag onto main (creating a real release version). On all other branches it will simply log output the version that would be created if the PR was merged (assuming that it's up to date from a git perspective with main). This can be a handy way for developers to check the release impact they intend to create will happen before they merge.
+         - It's noteworthy here that the frontend and backend are going to be tagged as a version together. This may or may not be ideal depending on organisation choice. Normally the Frontend and Backend would have separate repositories where each are individually versioned. When separated, it also allows you to individually build and ship each component which may be rewarding from a velocity standpoint. In this case, where they are so closely tied together and probably direct dependent on each other at a chosen version (and for the sake of keeping things simple) I have tagged the repository as a single tag, rather than splitting my application variant.
+         - Because I plan to hook github workflows together, I am going to use a personal github token coined PA_TOKEN. This is the user token that will conduct the release of the tag, but also trigger any downstream workflows on the tag itself. If you use the default GITHUB_TOKEN it will stop you chaining workflows together to prevent workflow run-away. If this repository is to be forked the PA_TOKEN variable will need added to the repository as an action secret to allow semantic release to happen correctly. The token will need read and write into the repository code, along with conducting releases. See https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens for how to create user tokens.
+         - https://github.com/johnrwatson/si-assessment-ie3/pull/3
 
 2. CI (Continuous Integration): Build, Test, and Release flow:
    - [ ] Build + Containerize the applications, with local deployment validation

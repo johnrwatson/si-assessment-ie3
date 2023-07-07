@@ -1,0 +1,47 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - name: Install dependencies
+        working-directory: .semver
+        run: npm ci
+      - name: Verify the integrity for installed dependencies
+        working-directory: .semver
+        run: npm audit signatures
+      # ---------------------------------------------------------------------------------------------------------------------
+      # Either conduct the release or push back in the log to the user the version that would be generated based on the commits
+      # ---------------------------------------------------------------------------------------------------------------------
+      - name: Conduct Release
+        if: github.ref == 'refs/heads/main'
+        working-directory: .semver
+        env:
+          GITHUB_TOKEN: ${{ secrets.PA_TOKEN }} # Can't use default token for chaining actions together
+        run: npx semantic-release
+      - name: Release Validate Generated Version
+        if: github.ref != 'refs/heads/main'
+        working-directory: .semver
+        run: |
+          npx semantic-release --dry-run --branches $GITHUB_REF_NAME
+          echo "Info: If $GITHUB_REF_NAME is merged it will create the above release [DRY RUN ABOVE, ASSUMING SYNCED WITH MAIN]"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PA_TOKEN }} # Can't use default token for chaining actions together
