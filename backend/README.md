@@ -8,7 +8,7 @@ It exposes a REST API that allows for creating users and tracking the tasks
 they create.
 
 It stores all of its data *in memory*, which means when the server restarts,
-any information it stores will be gone. 
+any information it stores will be gone.
 
 ## Changes to the backend
 
@@ -30,12 +30,13 @@ $ npm install
 ## Development
 
 To run the API for development, we recommend you run it in `dev` mode. This
-will restart the server automatically when you make changes to the 
+will restart the server automatically when you make changes to the
 source. (Remember that means all the data will be destroyed, so make sure you
 log out of the frontend after you make changes, or risk being out of sync.)
 
 ```
 $ npm run dev
+# By default the backend runs on port 3030
 ```
 
 To run the service without restarting it automatically, you can use:
@@ -61,7 +62,7 @@ $ npm run test:watch
 
 ## Linting
 
-We use [eslint](https://eslint.org/) to help us find problems with the code. 
+We use [eslint](https://eslint.org/) to help us find problems with the code.
 You can run the linter by:
 
 ```
@@ -111,7 +112,7 @@ Create a new user.
 {
   "id": "f62eab5e-b0f5-47de-b60b-b3cd13d883ed",
   "name": "bobo"
-} 
+}
 ```
 
 ### GET /api/users
@@ -129,7 +130,7 @@ Returns a list of users.
   {
       "id": "f62eab5e-b0f5-47de-b60b-b3cd13d883ed",
       "name": "bobo"
-  } 
+  }
 ]
 ```
 

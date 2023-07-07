@@ -28,7 +28,8 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
          - https://github.com/johnrwatson/si-assessment-ie3/pull/3
 
 2. CI (Continuous Integration): Build, Test, and Release flow:
-   - [ ] Build + Containerize the applications, with local deployment validation
+   - [X] Build + Containerize the applications, with local deployment validation
+         - Added a hosting/docker/Dockerfile into each application path and added a Makefile that allows quick validation of build, e.g. `make build-fe`. Additionally, `make deploy` immediately deploys the two tags of si-assessment-ie3-backend:latest and si-assessment-ie3-frontned:latest, which would be available locally if `make build-fe` / `make build-be` were used. The `local-development/docker-compose-stack.yml` file can be manipulated accordingly if the developer or tester wanted to check two different versions of the services together. On `make deploy` the frontend service can be reached on x and the backend service can be reached on y.
    - [ ] Initiate tests in CI
      - [ ] Lint
      - [ ] Unit Test

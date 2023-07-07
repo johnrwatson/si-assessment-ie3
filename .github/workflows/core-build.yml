@@ -1,0 +1,30 @@
+# This workflow will build the two projects
+
+name: core-build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Start mongodb Sidecar
+      run: docker-compose -f "./local-development/docker-compose-mongo.yml" up -d
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Build
+      run: make build
+
+    - name: Test
+      run: go test -v ./...
