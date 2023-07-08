@@ -1,0 +1,86 @@
+# Commented out sections so the apply and delete doesn't nuke the supporting resources, included here
+# just so reviewer has full transparency.
+# ----------------------------------------------------------------------------------------------------
+
+# ---
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: si-assessment-ie3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: si-assessment-ie3
+  namespace: si-assessment-ie3
+spec:
+  selector:
+    matchLabels:
+      app: si-assessment-ie3
+      department: si-assessment-ie3
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: si-assessment-ie3
+        department: si-assessment-ie3
+    spec:
+      containers:
+        # Using a multi-container pod as the two applications are directly dependent on eachother.
+        # In production you would likely split these to be two separate services with their own
+        # networking routes/services etc.
+        - name: si-assessment-ie3-backend
+          image: us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:IMAGE_VERSION
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /api/users
+              port: 3030
+            failureThreshold: 1
+            periodSeconds: 10
+          ports:
+          - containerPort: 3030
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "500m"
+        - name: si-assessment-ie3-frontend
+          image: us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:IMAGE_VERSION
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            failureThreshold: 1
+            periodSeconds: 10
+          ports:
+          - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "125m"
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: si-assessment-ie3
+#   namespace: si-assessment-ie3
+#   labels:
+#     app: si-assessment-ie3
+#     department: si-assessment-ie3
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: si-assessment-ie3
+#     department: si-assessment-ie3
+#   ports:
+#     - protocol: TCP
+#       name: frontend
+#       port: 8080
+#       targetPort: 8080
+#     - protocol: TCP
+#       name: backend
+#       port: 3030
+#       targetPort: 3030

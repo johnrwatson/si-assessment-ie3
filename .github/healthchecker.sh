@@ -53,8 +53,8 @@ main() {
 
 }
 
-export SECS_TO_CHECK=$1  # < 60 (minutes) >
-export AUTH_HEADERS=$2   # < automation-user:automation-user >
-export URLS="${@:3}"     # < List of URLs >
+SECS_TO_CHECK=$1  # < 60 (minutes) >
+AUTH_HEADERS=$2   # < automation-user:automation-user >
+URLS="${@:3}"     # < List of URLs >
 
-main $SECS_TO_CHECK $URLS
+main

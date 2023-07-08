@@ -10,6 +10,12 @@ I have broken the approach into three sections: Development Flow, Continuous Int
 
 Hopefully this makes it easier to follow the path I have taken. I have also outlined the reasoning behind each of the bullets in the below list, along with the PR(s) that added that functionality if that helps.
 
+## General Summary of Functionality:
+1. Cut main and raise a PR back in with any changes you wish to introduce
+2. CI will run off the PR and run build, testing + docker upload into GCR
+3. On merge into main the commits will be analysed and the relevant tag will be added to the HEAD commit of main based on the commit messages.
+4. Once the tag is added, a new workflow run will start to promote that tag/build into the development environment.
+
 ## Path Checklist
 
 1. Development Flow: Branch protection, code integrity, and establish development flow:
@@ -41,20 +47,25 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
            - https://github.com/johnrwatson/si-assessment-ie3/pull/5
      - [X] Unit Test
            - https://github.com/johnrwatson/si-assessment-ie3/pull/5
-     - [] Security Scan
+     - [ ] Security Scan
            - https://github.com/johnrwatson/si-assessment-ie3/pull/5
      - [X] SBOM Generation
            - https://github.com/johnrwatson/si-assessment-ie3/pull/5
-   - [ ] Initiate release flow to an Artifact Registry
+   - [X] Initiate release flow to an Artifact Registry
+           - On merge to main, it deploys the latest tags into a GCR respository (one for frontend, one for backend). This is not ideal as it's using mutable artifacts/tags but for development it means that the environment is always a reflection of what has been merged to main (assuming that the ci-cd passes). I was a bit pressed for time, but I would have loved to spend time making sure that the version reflected in the environment is a uniquely identifable artifact that has it's own version that matches the git tag.
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/7
    - [ ] Register the service with the Artifact Database
+           - Unfortunately didn't get time to get around to this, but registering the built artifacts in a metadata store would allow us to query their status and quality before deployment time. I.e. on test pass we register a key against the artifact in a metadatastore and then at deployment time we can query whether the artifact meets our criteria to be active in the given environment. For example, if we needed to have a SBOM (software bill of materials) available to run something in Production for complaince reasons, the metadata service would inform us whether that is the case or not.
 
 3. CD (Continuous Delivery): Deploying the Applications
    - [X] Establish some baseline/basic IaC for environments
            - Created a very basic development environment using a Google Kubernetes Engine cluster in Autopilot mode. Leveraged my personal project (artifact-flow) using the free tier in us-west-1 for both the bucket for TF state and the cluster itself. Added a very basic github workflow for the creation and destruction of the infrastructure via CI. Usually this infrastructure wouldn't be within this repository and on-merge of the separate IaC repository the TF would be planned and applied automatically.
            - https://github.com/johnrwatson/si-assessment-ie3/pull/6
    - [ ] Automatic validation environment for development branches
-   - [ ] Development environment establishment with Artifact metadata validation
+           - Unfortunately didn't get time to get around to this, but I would have loved on PR creation for a development environment of the stack to be spun up to validate it. This has proved invaluable in the past for some of the projects I have worked on where development velocity is of highest criticality.
+   - [X] Development environment establishment with Artifact metadata validation
+           - Added a Google Kubernetes Autopilot cluster with a basic kubernetes manifest to dep
 
-## Considerations
-
-TODO: List considerations for users of the repository.
+## Other Considerations
+1. If the cluster or the kubernetes service is deleted the service IP built into the application will rotate, which will need a git update within the app before it will function as expected for the callout to the backend. This could be significantly improved so an artifact rebuild is not required.
+2. If forking the repository you will need to add both a PA_TOKEN but also a valid key for my personal GCP project in the form of the GOOGLE_CREDENTIALS variable. I've added all the reviewers as contributors so they can cut a branch + just work it through within my repository. If the PA_TOKEN variable is missing the semantic versioning will not function. Without the GOOGLE_CREDENTIALS the pipeline will be unable to push into GCR or deploy into the GKE cluster.
