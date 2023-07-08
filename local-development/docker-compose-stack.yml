@@ -1,19 +1,19 @@
 version: "3"
 services:
-  #si-assessment-ie3-frontend:
-  #  image: si-assessment-ie3-frontend:latest
-  #  ports:
-  #    - "8080:8080"
-  #  platform: linux/amd64 # To accommodate for cross-platform builds (e.g. M series mac)
-  #  environment:
-  #    EXAMPLE_ENV_VAR_FE: ${EXAMPLE_ENV_VAR_FE}
+  si-assessment-ie3-frontend:
+    image: si-assessment-ie3-frontend:latest
+    ports:
+      - "8080:8080"
+    platform: linux/amd64 # To accommodate for cross-platform builds (e.g. M series mac)
+    environment:
+      EXAMPLE_ENV_VAR_FE: ${EXAMPLE_ENV_VAR_FE}
 
   si-assessment-ie3-backend:
     image: si-assessment-ie3-backend:latest
     ports:
       - "3030:3030"
     platform: linux/amd64 # To accommodate for cross-platform builds (e.g. M series mac)
-    #links:
-    #  - si-assessment-ie3-frontend
+    links:
+      - si-assessment-ie3-frontend
     environment:
       EXAMPLE_ENV_VAR_BE: ${EXAMPLE_ENV_VAR_BE}
