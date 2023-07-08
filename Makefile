@@ -18,7 +18,7 @@ build-fe:
 
 validate-be:
 	docker compose -f ./local-development/docker-compose-be.yml --env-file ./local-development/development.env up -d
-	.github/healthchecker.sh 15 user:pass http://localhost:3030/api/users
+	.github/healthchecker.sh 15 user:pass http://0.0.0.0:3030/api/users
 
 validate-fe:
 	docker compose -f ./local-development/docker-compose-fe.yml --env-file ./local-development/development.env up -d
