@@ -36,10 +36,14 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
    - [X] Initiate tests in CI
      - [X] Application Integrity: -
            - https://github.com/johnrwatson/si-assessment-ie3/pull/4
-     - [ ] Lint
-     - [ ] Unit Test
-     - [ ] Security Scan
-     - [ ] SBOM Generation
+     - [X] Lint
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [X] Unit Test
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [X] Security Scan
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [X] SBOM Generation
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
    - [ ] Initiate release flow to an Artifact Registry
    - [ ] Register the service with the Artifact Database
 

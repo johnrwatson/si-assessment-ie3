@@ -8,7 +8,49 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env: # environment variables (available in any part of the action)
+  NODE_VERSION: 20
+
 jobs:
+
+  test-matrix-fe: # At this stage likely doesn't need to be a matrix type
+    strategy: # due to 1 test. Using matrix so additional can be added in later easily.
+      matrix:
+        test: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Code ${{ matrix.test }}
+        working-directory: frontend
+        run: npm run ${{ matrix.test }}
+
+  test-matrix-be:
+    strategy:
+      matrix:
+        test: [lint, type-check, format]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Code ${{ matrix.test }}
+        working-directory: backend
+        run: npm run ${{ matrix.test }}
+
   build-fe:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +71,7 @@ jobs:
 
   # This will be developed out to include the deployment of the images
   deploy-apps:
-    needs: [build-fe, build-be]
+    needs: [test-matrix-be, test-matrix-fe, build-fe, build-be]
     runs-on: ubuntu-latest
 
     steps:
