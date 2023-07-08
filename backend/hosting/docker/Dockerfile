@@ -27,4 +27,4 @@ COPY ./backend .
 EXPOSE 3030
 
 # run the backend service
-CMD [ "node", "./dist/index.js" ]
+CMD [ "npm", "run", "start" ]
