@@ -94,7 +94,7 @@ jobs:
       - name: Promote Latest Tag from Commit Build
         if: startsWith(github.event.ref, 'refs/tags/')
         run: |
-          docker tag us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:$GITHUB_SHA us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-backend:${GITHUB_REF#refs/*/}
+          docker tag us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:$GITHUB_SHA us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:${GITHUB_REF#refs/*/}
           docker push us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:${GITHUB_REF#refs/*/}
 
   build-be:
