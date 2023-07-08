@@ -6,7 +6,8 @@ import { defineStore } from "pinia";
 import { mande } from "mande";
 import { useUserStore } from "./user";
 
-export const taskApi = mande("/api/tasks");
+// This isn't great, it should be an environment variable but it will do for development/where BE/FE are tied together
+export const taskApi = mande("http://localhost:3030/api/tasks");
 
 // A single task; corresponds to the `Task` on the backend.
 export interface Task {

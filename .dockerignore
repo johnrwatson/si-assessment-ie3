@@ -1,0 +1,5 @@
+# Basic dockerignore file to ignore certain paths in the docker builds
+# This is handy to stop secrets/env files/local builds making it into the Production ones.
+
+**/dist
+*.env

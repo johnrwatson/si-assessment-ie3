@@ -4,7 +4,8 @@
 import { defineStore } from "pinia";
 import { mande } from "mande";
 
-export const userApi = mande("/api/users");
+// This isn't great, it should be an environment variable but it will do for development/where BE/FE are tied together
+export const userApi = mande("http://localhost:3030/api/users");
 
 // The User type. Corresponds with a `User` on the backend.
 export interface User {

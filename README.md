@@ -28,8 +28,14 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
          - https://github.com/johnrwatson/si-assessment-ie3/pull/3
 
 2. CI (Continuous Integration): Build, Test, and Release flow:
-   - [ ] Build + Containerize the applications, with local deployment validation
-   - [ ] Initiate tests in CI
+   - [X] Build + Containerize the applications, with local deployment validation
+         - Added a hosting/docker/Dockerfile into each application path and added a Makefile that allows quick validation of build, e.g. `make build-fe`. Additionally, `make deploy` immediately deploys the two tags of si-assessment-ie3-backend:latest and si-assessment-ie3-frontned:latest, which would be available locally if `make build-fe` / `make build-be` were used. The `local-development/docker-compose-stack.yml` file can be manipulated accordingly if the developer or tester wanted to check two different versions of the services together. On `make deploy` the frontend service can be reached on x and the backend service can be reached on y. Also individually added a `make validate-be` and `make validate-fe` function to quickly validate the basic http integrity of the application variant. This ensures that no code changes makes it very far without maintaining application integrity while the unit-tests and other code-validation still pass. This should stop non-compatible changes in the origin baseimage adversely affecting the compatibility with the code at a basic level.
+         - Added all the above checks in a basic CI build pipeline
+         - `frontend/src/stores/task.ts` and `frontend/src/stores/user.ts` were adjusted (poorly) to allow the backend and frontend to talk together in a docker-based environment. This could be refactored later to be an environment variable or similar.
+         - https://github.com/johnrwatson/si-assessment-ie3/pull/4
+   - [X] Initiate tests in CI
+     - [X] Application Integrity: -
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/4
      - [ ] Lint
      - [ ] Unit Test
      - [ ] Security Scan
