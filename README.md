@@ -52,7 +52,7 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
      - [X] SBOM Generation
            - https://github.com/johnrwatson/si-assessment-ie3/pull/5
    - [X] Initiate release flow to an Artifact Registry
-           - On merge to main, it deploys the latest tags into a GCR respository (one for frontend, one for backend). This is not ideal as it's using mutable artifacts/tags but for development it means that the environment is always a reflection of what has been merged to main (assuming that the ci-cd passes). I was a bit pressed for time, but I would have loved to spend time making sure that the version reflected in the environment is a uniquely identifable artifact that has it's own version that matches the git tag.
+           - On merge to main, it deploys the latest tags into a GCR respository (one for frontend, one for backend). This is not ideal as it's using mutable artifacts/tags but for development it means that the environment is always a reflection of what has been merged to main (assuming that the ci-cd passes). I was a bit pressed for time, but I would have loved to spend time making sure that the version reflected in the environment is a uniquely identifiable artifact that has it's own version that matches the git tag.
            - https://github.com/johnrwatson/si-assessment-ie3/pull/7
    - [ ] Register the service with the Artifact Database
            - Unfortunately didn't get time to get around to this, but registering the built artifacts in a metadata store would allow us to query their status and quality before deployment time. I.e. on test pass we register a key against the artifact in a metadatastore and then at deployment time we can query whether the artifact meets our criteria to be active in the given environment. For example, if we needed to have a SBOM (software bill of materials) available to run something in Production for complaince reasons, the metadata service would inform us whether that is the case or not.
@@ -64,8 +64,10 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
    - [ ] Automatic validation environment for development branches
            - Unfortunately didn't get time to get around to this, but I would have loved on PR creation for a development environment of the stack to be spun up to validate it. This has proved invaluable in the past for some of the projects I have worked on where development velocity is of highest criticality.
    - [X] Development environment establishment with Artifact metadata validation
-           - Added a Google Kubernetes Autopilot cluster with a basic kubernetes manifest to dep
+           - Added a Google Kubernetes Autopilot cluster with a basic kubernetes manifest to deploy into the development environment
 
 ## Other Considerations
 1. If the cluster or the kubernetes service is deleted the service IP built into the application will rotate, which will need a git update within the app before it will function as expected for the callout to the backend. This could be significantly improved so an artifact rebuild is not required.
 2. If forking the repository you will need to add both a PA_TOKEN but also a valid key for my personal GCP project in the form of the GOOGLE_CREDENTIALS variable. I've added all the reviewers as contributors so they can cut a branch + just work it through within my repository. If the PA_TOKEN variable is missing the semantic versioning will not function. Without the GOOGLE_CREDENTIALS the pipeline will be unable to push into GCR or deploy into the GKE cluster.
+3. On the enterprise version of the CI system for Github it won't queue builds like it does on my free account, this will speed up the build if queueing is occuring.
+4. It's critical that CI pipeline files are as clean as possible to make them easy to maintain. A lot of the "shell" within the CI files I would like to refactor out into centralised functions to make them as re-usable and clean as possible across multiple projects.
