@@ -14,7 +14,7 @@ build-be:
 	docker build --platform linux/amd64 -f ./backend/hosting/docker/Dockerfile -t si-assessment-ie3-backend:latest .
 
 build-fe:
-	docker build --platform linux/amd64 -f ./frontend/hosting/docker/Dockerfile -t si-assessment-ie3-frontend:latest .
+	docker build --platform linux/amd64 --build-arg CI=${CI} -f ./frontend/hosting/docker/Dockerfile -t si-assessment-ie3-frontend:latest .
 
 validate-be:
 	docker compose -f ./local-development/docker-compose-be.yml --env-file ./local-development/development.env up -d

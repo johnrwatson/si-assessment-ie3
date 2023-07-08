@@ -2,9 +2,13 @@
 
 name: core-build
 
+# On push of a tag or open pull requests to main
+# Always promote the version into the artifact registry
+# But only deploy if it's a tag
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     branches: [ "main" ]
 
@@ -14,7 +18,7 @@ env: # environment variables (available in any part of the action)
 jobs:
 
   test-matrix-fe: # At this stage likely doesn't need to be a matrix type
-    strategy: # due to 1 test. Using matrix so additional can be added in later easily.
+    strategy:     # due to 1 test. Using matrix so additional can be added in later easily.
       matrix:
         test: [lint]
     runs-on: ubuntu-latest
@@ -76,6 +80,22 @@ jobs:
       #    echo "Info: Start of Trivy Scan for container image ${IMAGE_NAME}"
       #    trivy --no-progress --severity HIGH,CRITICAL ${IMAGE_NAME}
       #    echo "Info: End of Trivy Scan for container image ${IMAGE_NAME}"
+      - name: Install GCP CLI
+        run: curl https://sdk.cloud.google.com | bash
+      - name: Docker Push the Artifact into the Registry
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > ./google_sa_key.json
+          gcloud auth activate-service-account --key-file=./google_sa_key.json
+          docker tag si-assessment-ie3-frontend:latest us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:$GITHUB_SHA
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+          docker push us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:$GITHUB_SHA
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      - name: Promote Latest Tag from Commit Build
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: |
+          docker tag us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:$GITHUB_SHA us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-backend:${GITHUB_REF#refs/*/}
+          docker push us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-frontend/si-assessment-ie3-frontend:${GITHUB_REF#refs/*/}
 
   build-be:
     runs-on: ubuntu-latest
@@ -102,12 +122,46 @@ jobs:
       #    echo "Info: Start of Trivy Scan for container image ${IMAGE_NAME}"
       #    trivy --no-progress --severity HIGH,CRITICAL ${IMAGE_NAME}
       #    echo "Info: End of Trivy Scan for container image ${IMAGE_NAME}"
+      - name: Install GCP CLI
+        run: curl https://sdk.cloud.google.com | bash
+      - name: Docker Push the Artifact into the Registry
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > ./google_sa_key.json
+          gcloud auth activate-service-account --key-file=./google_sa_key.json
+          docker tag si-assessment-ie3-backend:latest us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:$GITHUB_SHA
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+          docker push us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:$GITHUB_SHA
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      - name: Promote Latest Tag from Commit Build
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: |
+          docker tag us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:$GITHUB_SHA us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:${GITHUB_REF#refs/*/}
+          docker push us-west1-docker.pkg.dev/artifact-flow/si-assessment-ie3-backend/si-assessment-ie3-backend:${GITHUB_REF#refs/*/}
 
-  # This will be developed out to include the deployment of the images
+  # Deploying the images into the development environment if on tag
   deploy-apps:
+    if: startsWith(github.event.ref, 'refs/tags/')
     needs: [test-matrix-be, test-matrix-fe, build-fe, build-be]
     runs-on: ubuntu-latest
-
     steps:
-      - name: Use Images Here
-        run: echo "Using images from previous build step here"
+      - name: Kubernetes Install
+        run: curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+      - name: Setup Gcloud Repositories for authentication plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install apt-transport-https ca-certificates gnupg curl
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+          sudo apt-get update
+          sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
+      - name: Kubernetes Deploy
+        run: |
+          echo "Info: Deploying ${GITHUB_REF#refs/*/} into development environment"
+          gcloud container clusters get-credentials si-assessment-ie3	--region us-west1 --project artifact-flow
+          sed -i "s/IMAGE_VERSION/${GITHUB_REF#refs/*/}/g" ./hosting/kubernetes/development.yml # Inject the version of the tag
+          kubectl delete -f ./hosting/kubernetes/development.yml
+          kubectl apply -f ./hosting/kubernetes/development.yml
+          .github/servicechecker.sh 15 si-assessment-ie3 si-assessment-ie3
+        env:
+          USE_GKE_GCLOUD_AUTH_PLUGIN: True

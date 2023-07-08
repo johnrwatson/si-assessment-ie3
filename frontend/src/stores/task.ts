@@ -5,9 +5,11 @@
 import { defineStore } from "pinia";
 import { mande } from "mande";
 import { useUserStore } from "./user";
+import fetch from "isomorphic-fetch";
 
-// This isn't great, it should be an environment variable but it will do for development/where BE/FE are tied together
-export const taskApi = mande("http://localhost:3030/api/tasks");
+// In a production situation the dns name hosting the FE would be injected here instead of a reserved static ip
+export const BASE_URL = process.env.NODE_ENV === "production" ? "http://35.247.107.51:3030" : "http://localhost:3030";
+export const taskApi = mande(BASE_URL + "/api/tasks", {}, fetch);
 
 // A single task; corresponds to the `Task` on the backend.
 export interface Task {
