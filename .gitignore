@@ -53,3 +53,6 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+
+# Secret key for local TF apply
+**google_sa_key.json

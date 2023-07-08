@@ -1,0 +1,38 @@
+name: Terraform Scheduled Workflow
+
+# Usually on-merge to main you would apply the changes that were modified.
+# This is just a simple example of the TF that can be created or destroyed on schedule or manually.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Create or Destroy'
+        required: true
+        default: 'null'
+        type: choice
+        options:
+        - apply
+        - destroy
+
+jobs:
+  terraform-apply-or-destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform init
+        working-directory: iac
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Terraform ${{ inputs.action }}
+        working-directory: iac
+        run: terraform ${{ inputs.action }} -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}

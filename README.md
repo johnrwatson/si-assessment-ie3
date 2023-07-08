@@ -49,7 +49,9 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
    - [ ] Register the service with the Artifact Database
 
 3. CD (Continuous Delivery): Deploying the Applications
-   - [ ] Establish some baseline/basic IaC for environments
+   - [X] Establish some baseline/basic IaC for environments
+           - Created a very basic development environment using a Google Kubernetes Engine cluster in Autopilot mode. Leveraged my personal project (artifact-flow) using the free tier in us-west-1 for both the bucket for TF state and the cluster itself. Added a very basic github workflow for the creation and destruction of the infrastructure via CI. Usually this infrastructure wouldn't be within this repository and on-merge of the separate IaC repository the TF would be planned and applied automatically.
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/6
    - [ ] Automatic validation environment for development branches
    - [ ] Development environment establishment with Artifact metadata validation
 

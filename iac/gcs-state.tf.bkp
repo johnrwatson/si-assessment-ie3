@@ -1,0 +1,19 @@
+# ---------------------------------------------------
+# This is the gcs bucket with the state in it for terraform
+# DO NOT DELETE THIS
+# ---------------------------------------------------
+resource "google_storage_bucket" "default" {
+  name          = "si-assessment-ie3-tfstate"
+  force_destroy = false
+  location      = "US"
+  storage_class = "STANDARD"
+  versioning {
+    enabled = true
+  }
+  labels = {
+    "product"     = "si-assessment",
+    "environment" = "development",
+    "terraform"   = "true",
+  }
+}
+# ---------------------------------------------------
