@@ -7,6 +7,9 @@
       "@/*": ["./src/*"]
     },
     "allowJs": true,
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost", "webworker"],
+    "types": ["node"],
+    "noImplicitAny": false
   },
   "references": [
     {

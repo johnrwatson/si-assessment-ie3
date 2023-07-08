@@ -8,6 +8,9 @@
 
 FROM node:lts-alpine
 
+# Set a build arg to determine whether local or CI build
+ARG CI
+
 # install simple http server for serving static content
 RUN npm install -g http-server
 
@@ -23,8 +26,8 @@ RUN npm install
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY ./frontend .
 
-# build app for production with minification
-RUN npm run build
+# build app for production with minification if in CI, otherwise make it a local build
+RUN if [ "$CI" = "true" ]; then NODE_ENV="production" npm run build; else NODE_ENV="development" npm run build-development; fi
 
 # expose the port for the frontend service
 EXPOSE 8080
