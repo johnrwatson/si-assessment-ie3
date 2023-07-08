@@ -8,7 +8,49 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env: # environment variables (available in any part of the action)
+  NODE_VERSION: 20
+
 jobs:
+
+  test-matrix-fe: # At this stage likely doesn't need to be a matrix type
+    strategy: # due to 1 test. Using matrix so additional can be added in later easily.
+      matrix:
+        test: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Code ${{ matrix.test }}
+        working-directory: frontend
+        run: npm run ${{ matrix.test }}
+
+  test-matrix-be:
+    strategy:
+      matrix:
+        test: [lint, type-check, format]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Code ${{ matrix.test }}
+        working-directory: backend
+        run: npm run ${{ matrix.test }}
+
   build-fe:
     runs-on: ubuntu-latest
     steps:
@@ -17,6 +59,23 @@ jobs:
         run: make build-fe
       - name: Make validate FE (checks the application's integrity at a basic level)
         run: make validate-fe
+      - name: SBOM generation
+        run: |
+          export IMAGE_NAME="si-assessment-ie3-frontend:latest"
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          echo "Info: Start of SBOM for container image ${IMAGE_NAME}"
+          /usr/local/bin/syft ${IMAGE_NAME} --scope all-layers
+          echo "Info: End of SBOM for container image ${IMAGE_NAME}"
+      # Couldn't quite get this to work in the timeframe but can easily be added after
+      #- name: Trivy Scan
+      #  run: |
+      #    export IMAGE_NAME="si-assessment-ie3-frontend:latest"
+      #    apt update && apt install wget
+      #    wget https://github.com/aquasecurity/trivy/releases/download/v0.43.1/trivy_0.43.1_Linux-64bit.deb
+      #    sudo apt install ./trivy_0.43.1_Linux-ARM64.deb
+      #    echo "Info: Start of Trivy Scan for container image ${IMAGE_NAME}"
+      #    trivy --no-progress --severity HIGH,CRITICAL ${IMAGE_NAME}
+      #    echo "Info: End of Trivy Scan for container image ${IMAGE_NAME}"
 
   build-be:
     runs-on: ubuntu-latest
@@ -26,10 +85,27 @@ jobs:
         run: make build-be
       - name: Make validate BE (checks the application's integrity at a basic level)
         run: make validate-be
+      - name: SBOM generation
+        run: |
+          export IMAGE_NAME="si-assessment-ie3-backend:latest"
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          echo "Info: Start of SBOM for container image ${IMAGE_NAME}"
+          /usr/local/bin/syft ${IMAGE_NAME} --scope all-layers
+          echo "Info: End of SBOM for container image ${IMAGE_NAME}"
+      # Couldn't quite get this to work in the timeframe but can easily be added after
+      #- name: Trivy Scan
+      #  run: |
+      #    export IMAGE_NAME="si-assessment-ie3-backend:latest"
+      #    apt update && apt install wget
+      #    wget https://github.com/aquasecurity/trivy/releases/download/v0.43.1/trivy_0.43.1_Linux-64bit.deb
+      #    sudo apt install ./trivy_0.43.1_Linux-ARM64.deb
+      #    echo "Info: Start of Trivy Scan for container image ${IMAGE_NAME}"
+      #    trivy --no-progress --severity HIGH,CRITICAL ${IMAGE_NAME}
+      #    echo "Info: End of Trivy Scan for container image ${IMAGE_NAME}"
 
   # This will be developed out to include the deployment of the images
   deploy-apps:
-    needs: [build-fe, build-be]
+    needs: [test-matrix-be, test-matrix-fe, build-fe, build-be]
     runs-on: ubuntu-latest
 
     steps:

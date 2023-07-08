@@ -34,12 +34,17 @@ Hopefully this makes it easier to follow the path I have taken. I have also outl
          - `frontend/src/stores/task.ts` and `frontend/src/stores/user.ts` were adjusted (poorly) to allow the backend and frontend to talk together in a docker-based environment. This could be refactored later to be an environment variable or similar.
          - https://github.com/johnrwatson/si-assessment-ie3/pull/4
    - [X] Initiate tests in CI
+     - All code-level tests added as a matrix to save as much time as possible in CI/feedback. In reality developer/tester time is magnitudes more important that CI cost, so this is the preferable route in most situations. Added an SBOM Generation to the tail end of the build workflow. This isn't ideal as it's a bit untidy and slows the critical path (with the build already being the slowest task) but in total it's only ~1 minute which is pretty quick. I couldn't quite get the Trivy scan to work in the pipeline within the time constraints but the example workflow provided (commented out) is very close, just an envrionment issue/diff between local:remote.
      - [X] Application Integrity: -
            - https://github.com/johnrwatson/si-assessment-ie3/pull/4
-     - [ ] Lint
-     - [ ] Unit Test
-     - [ ] Security Scan
-     - [ ] SBOM Generation
+     - [X] Lint
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [X] Unit Test
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [] Security Scan
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
+     - [X] SBOM Generation
+           - https://github.com/johnrwatson/si-assessment-ie3/pull/5
    - [ ] Initiate release flow to an Artifact Registry
    - [ ] Register the service with the Artifact Database
 
